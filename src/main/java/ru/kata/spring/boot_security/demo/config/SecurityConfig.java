@@ -1,7 +1,7 @@
 package ru.kata.spring.boot_security.demo.config;
 
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import ru.kata.spring.boot_security.demo.service.UserService;
-import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -10,15 +10,17 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserService userService;
+    private final LoginSuccessHandler successUserHandler;
 
-    public SecurityConfig(UserService userService) {
+    public SecurityConfig(UserService userService, LoginSuccessHandler successUserHandler) {
         this.userService = userService;
+        this.successUserHandler = successUserHandler;
     }
 
     @Override
@@ -30,29 +32,28 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
+                .antMatchers("/login").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/user/**").hasAnyRole("ADMIN", "USER")
-                .antMatchers("/", "/login").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .successHandler(successHandler())
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .usernameParameter("email")
+                .passwordParameter("password")
+                .successHandler(successUserHandler)
+                .failureUrl("/login?error=true")
                 .and()
                 .logout()
-                .logoutUrl("/logout")
                 .logoutSuccessUrl("/login")
-                .permitAll()
                 .and()
-                .csrf().disable();
+                .csrf()
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationSuccessHandler successHandler() {
-        return new LoginSuccessHandler();
     }
 }

@@ -10,7 +10,9 @@ public interface UserService extends UserDetailsService {
     List<User> getAllUsers();
     User getUserById(Long id);
     void saveUser(User user, Set<Long> roleIds);
-    void editUser(Long id, User user);
+    //void editUser(Long id, User user);
     void deleteUser(Long id);
     List<Role> getAllRoles();
+    User findByEmail(String email);
+    void editUser(Long id, String firstName, String lastName, int age, String email, String password, Set<Long> roleIds);
 }
