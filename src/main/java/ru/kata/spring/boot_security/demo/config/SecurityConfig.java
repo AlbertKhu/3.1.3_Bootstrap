@@ -1,5 +1,6 @@
 package ru.kata.spring.boot_security.demo.config;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import ru.kata.spring.boot_security.demo.service.UserService;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +19,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserService userService;
     private final LoginSuccessHandler successUserHandler;
 
-    public SecurityConfig(UserService userService, LoginSuccessHandler successUserHandler) {
+    public SecurityConfig(@Lazy UserService userService, LoginSuccessHandler successUserHandler) {
         this.userService = userService;
         this.successUserHandler = successUserHandler;
     }
