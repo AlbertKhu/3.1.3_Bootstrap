@@ -1,5 +1,4 @@
 package ru.kata.spring.boot_security.demo.config;
-
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import ru.kata.spring.boot_security.demo.service.UserService;
